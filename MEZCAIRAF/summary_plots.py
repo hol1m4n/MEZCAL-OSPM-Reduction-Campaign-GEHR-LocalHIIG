@@ -61,7 +61,7 @@ def diag_masterbias(work_dir):
                  f'[σ debe ser ≈ readnoise/√N_bias]')
 
     plt.tight_layout()
-    plt.savefig(f'{work_dir}Summary/diag_masterbias.png', dpi=150)
+    plt.savefig(f'{work_dir}Summary/diag_masterbias.png', dpi=80)
     plt.close()
     print(f'  → Masterbias: μ={mu:.2f}, σ={sigma:.3f} ADUs')
 
@@ -97,7 +97,7 @@ def diag_flats(work_dir):
         ax.legend(fontsize=8)
 
     plt.tight_layout()
-    plt.savefig(f'{work_dir}Summary/diag_flats_perfiles.png', dpi=150)
+    plt.savefig(f'{work_dir}Summary/diag_flats_perfiles.png', dpi=80)
     plt.close()
 
     # Histograma del FlatNmaster final
@@ -122,7 +122,7 @@ def diag_flats(work_dir):
         axes[1].set_title('Perfil espectral [debe ser ~1.0]')
 
         plt.tight_layout()
-        plt.savefig(f'{work_dir}Summary/diag_FlatNmaster_final.png', dpi=150)
+        plt.savefig(f'{work_dir}Summary/diag_FlatNmaster_final.png', dpi=80)
         plt.close()
 
 
@@ -132,45 +132,41 @@ def diag_flats(work_dir):
     # Masterflat
     with fits.open(archivos['masterflat (crudo)']) as hdul:
         data = hdul[0].data
-    ax = axes[0, 0]
+    ax = axes[0, 0] # <--- Correcto
     vmin, vmax = np.percentile(data, [1, 99])
     im = ax.imshow(data, cmap='viridis', origin='lower', aspect='auto', vmin=vmin, vmax=vmax)
     plt.colorbar(im, ax=ax)
     ax.set_title('Masterflat crudo')
 
     # FlatNpre_lumcor
-    ax = axes[0, 1]
     with fits.open(archivos['FlatNpre_lumcor']) as hdul:
         data = hdul[0].data
-    ax = axes[0, 0]
+    ax = axes[0, 1] # <--- CORREGIDO (eliminada sobrescritura)
     vmin, vmax = np.percentile(data, [1, 99])
     im = ax.imshow(data, cmap='viridis', origin='lower', aspect='auto', vmin=vmin, vmax=vmax)
     plt.colorbar(im, ax=ax)
     ax.set_title('Flat Normalizado No Illum correction')
 
-
     # FlatIllum
-    ax = axes[1, 0]
     with fits.open(archivos['FlatIllum']) as hdul:
         data = hdul[0].data
-    ax = axes[0, 0]
+    ax = axes[1, 0] # <--- CORREGIDO (eliminada sobrescritura)
     vmin, vmax = np.percentile(data, [1, 99])
     im = ax.imshow(data, cmap='viridis', origin='lower', aspect='auto', vmin=vmin, vmax=vmax)
     plt.colorbar(im, ax=ax)
     ax.set_title('Flat Illum correction')
 
     # FlatNmaster
-    ax = axes[1, 1]
     with fits.open(archivos['FlatNmaster (final)']) as hdul:
         data = hdul[0].data
-    ax = axes[0, 0]
+    ax = axes[1, 1] # <--- CORREGIDO (eliminada sobrescritura)
     vmin, vmax = np.percentile(data, [1, 99])
     im = ax.imshow(data, cmap='viridis', origin='lower', aspect='auto', vmin=vmin, vmax=vmax)
     plt.colorbar(im, ax=ax)
     ax.set_title('FlatNmaster (final)')
 
     plt.tight_layout()
-    plt.savefig(f'{work_dir}Summary/diag_Flats_2D_images.png', dpi=150)
+    plt.savefig(f'{work_dir}Summary/diag_Flats_2D_images.png', dpi=80)
     plt.close()
 
 
@@ -222,7 +218,7 @@ def diag_cosmic_removal(work_dir, tipo='ARCS', sufijo_trim='trim', sufijo_cr='cr
 
         plt.tight_layout()
         outname = f'{folder.replace(f'{tipo}','Summary')}diag_cosmics_{tipo.lower()}_{nombre}.png'
-        plt.savefig(outname, dpi=150)
+        plt.savefig(outname, dpi=80)
         plt.close()
         print(f'  → {tipo} CR fraction: {frac_cr:.3f}%  ({"OK" if frac_cr < 1.0 else "REVISAR"})')
 
@@ -308,7 +304,7 @@ def diag_wl_calibration(work_dir):
     axes[1].legend()
 
     plt.tight_layout()
-    plt.savefig(f'{work_dir}Summary/diag_wl_calibration_quality.png', dpi=150)
+    plt.savefig(f'{work_dir}Summary/diag_wl_calibration_quality.png', dpi=80)
     plt.close()
 
     # Plot solución pixel-lambda para el primer arco con datos
@@ -333,7 +329,7 @@ def diag_wl_calibration(work_dir):
                 axes[1].set_ylabel('Residual (Å)')
                 axes[1].set_title(f'Residuales  σ={np.std(residuals):.3f} Å')
             plt.tight_layout()
-            plt.savefig(f'{work_dir}Summary/diag_wl_solucion_{r["nombre"]}.png', dpi=150)
+            plt.savefig(f'{work_dir}Summary/diag_wl_solucion_{r["nombre"]}.png', dpi=80)
             plt.close()
             #break
 
@@ -396,7 +392,7 @@ def diag_post_transform(work_dir):
                     axes[2].axvline(wl, color='r', linestyle='--', alpha=0.7, lw=0.8)
 
         plt.tight_layout()
-        plt.savefig(outpath, dpi=150)
+        plt.savefig(outpath, dpi=80)
         plt.close()
 
     # Líneas de cielo y arco de referencia (ThAr comunes + cielo)
@@ -528,7 +524,7 @@ def diag_1d_spectra(work_dir):
 
         plt.tight_layout()
         outname = (path.replace('.fits', '_diag.png')).replace('OBJS','Summary')
-        plt.savefig(outname, dpi=150)
+        plt.savefig(outname, dpi=80)
         plt.close()
         print(f'  → {Path(path).name}  S/N≈{snr:.1f}')
 

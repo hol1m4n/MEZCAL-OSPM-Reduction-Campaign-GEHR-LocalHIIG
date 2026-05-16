@@ -21,7 +21,7 @@ from summary_plots import summary_plotter
 
 notify('START',mode='M')
 
-work_dir = '/home/hollman/GEHR_specs/2023jun_spm/nite01/'
+work_dir = '/home/hollman/GEHR_specs/2023jun_spm/nite02/'
 
 
 notify(f'Trabajando en {work_dir}')
@@ -43,7 +43,7 @@ ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir)
 
 notify('END',mode='M')
 
-plotear_resumen = False
+plotear_resumen = True
 
 if plotear_resumen:
     summary_plotter(work_dir)

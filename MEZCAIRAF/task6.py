@@ -98,7 +98,7 @@ def ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir):
                     bkg = "yes"            , #Subtract background in automatic width?
                     r_grow = 0.0             , #Grow limits by this factor
                     avglimits = "no"             , #Average limits over all apertures?\n\n# TRACING PARAMETERS\n
-                    t_nsum = 20             , #Number of dispersion lines to sum
+                    t_nsum = 100             , #Number of dispersion lines to sum
                     t_step = 10             , #Tracing step
                     t_nlost = 3              , #Number of consecutive times profile is lost before quitting
                     t_function = "legendre"     , #Trace fitting function
@@ -165,19 +165,21 @@ def ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir):
                     fig = plt.figure(figsize=(15, 10))
                     ax = fig.add_subplot()
                     ax.step(longitud_onda, flujo, where='mid', color='black', lw=1)
-                    ax.axvline(x=6564.6, color='r', linestyle='--')
+                    ax.axvline(x=6562.80, color='r', linestyle='--')
+                    ax.text(6562.80, ax.get_ylim()[1]*0.9, 'Hα',
+                                color='r', fontsize=17, rotation=90, va='top')
                     ax.set_xlabel(f"Longitud de Onda ({header.get('CUNIT1', 'Ang')})")
                     ax.set_ylabel("Flujo (ADUs / Electrones)")
                     ax.set_title(f"Espectro: {header.get('OBJECT', 'Sin nombre')}")
                     ax.grid(alpha=0.3)
-                    fig.savefig(ruta_fits.replace('.fits', '.png'),dpi=150)
+                    fig.savefig((ruta_fits.replace('.fits', '.png')).replace('OBJS','Redux'),dpi=80)
                     plt.close(fig)
 
             _1D = [f for f in os.listdir(f'{work_dir}OBJS') if f.endswith(".fits") and '1d' in f.lower()]
             _1D.sort()
 
             for spec in _1D:
-                plot_espectro_1d(f'{work_dir}Redux/{spec}')
+                plot_espectro_1d(f'{work_dir}OBJS/{spec}')
 
             RS['21'][0] = True
             guardar_logfile(f'{work_dir}/log_reduc',RS)
