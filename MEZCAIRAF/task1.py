@@ -5,7 +5,7 @@ from utils import notify
 from utils import guardar_logfile
 from utils import list_generator
 from utils import Plotganizer
-
+from utils import task_checker
 
 def MASTERBIAS(work_dir):
 
@@ -20,6 +20,9 @@ def MASTERBIAS(work_dir):
     notify('Comienza creacion del MASTERFLAT')
     notify('Generacion de listas de bias')
 
+
+
+    task_verifier = task_checker(1,RS)
     if RS['1'][0] == False:
         try:
             list_generator(FOLDER=f'{work_dir}BIAS', 
@@ -32,6 +35,10 @@ def MASTERBIAS(work_dir):
         except:
             RS['1'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['1'][1]}')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['1'][1]} porque hay tareas anteriores pendientes.')
 
 
 
@@ -39,8 +46,13 @@ def MASTERBIAS(work_dir):
 
 
 
+
+
+    task_verifier = task_checker(2,RS)
     if RS['2'][0] == True:
         notify('Los bias ya estan cortados con CCDPROC')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['2'][1]} porque hay tareas anteriores pendientes.')
     else:
         try:
             notify('Cortando bias con CCDPROC')
@@ -81,14 +93,17 @@ def MASTERBIAS(work_dir):
         except:
             RS['2'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['2'][1]}')
 
 
 
 
-
-
+    task_verifier = task_checker(3,RS)
     if RS['3'][0] == True:
         notify('El masterbias existe')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['3'][1]} porque hay tareas anteriores pendientes.')
     else:
         try:
             notify('Creando el masterbias')
@@ -120,7 +135,8 @@ def MASTERBIAS(work_dir):
         except:
             RS['3'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)
-
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['3'][1]}')
 
 
 

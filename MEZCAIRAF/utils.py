@@ -46,8 +46,8 @@ class Plotganizer:
                 return ['zero','Bias','BIAS']
             elif "flat" in name.lower():
                 return ['flat','Flat','FLATS']
-            elif "focus" in name.lower():
-                return ['object','Focus']
+            elif "focus" in name.lower() or "foco" in name.lower():
+                return ['object','Focus','FOCUS']
             elif "image" in name.lower():
                 return ['object','Image','IMAGES']
             else:
@@ -247,6 +247,12 @@ def guardar_logfile(ruta, diccionario):
 
 
 
+
+def task_checker(task,log_dict):
+    current_task = task
+    previous_tasks = [str(i) for i in range(0, current_task)]
+    task_verifier = all(log_dict.get(t, [False])[0] is True for t in previous_tasks)
+    return task_verifier    
 
 
 

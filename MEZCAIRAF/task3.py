@@ -5,6 +5,7 @@ from utils import notify
 from utils import guardar_logfile
 from utils import list_generator
 from utils import Plotganizer
+from utils import task_checker
 from joblib import Parallel, delayed
 from cosmicray_cleaner import cosmicos_cleaner
 import os
@@ -22,6 +23,8 @@ def ARCOS(work_dir):
     notify('Comienza el corte de los Arcos ')
     notify('Generacion de listas de arcos')
 
+
+    task_verifier = task_checker(8,RS)
     if RS['8'][0] == False:
         try:
             list_generator(FOLDER=f'{work_dir}ARCS', 
@@ -34,11 +37,19 @@ def ARCOS(work_dir):
         except:
             RS['8'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['8'][1]}')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['8'][1]} porque hay tareas anteriores pendientes.')
 
 
 
+
+    task_verifier = task_checker(9,RS)
     if RS['9'][0] == True:
         notify('Los arcos ya estan cortados con CCDPROC + masterbias + FlatNmaster.fits')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['9'][1]} porque hay tareas anteriores pendientes.')
     else:
         try:
             notify('Cortando arcos con CCDPROC + masterbias + FlatNmaster.fits')
@@ -83,13 +94,14 @@ def ARCOS(work_dir):
         except:
             RS['9'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)
-
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['9'][1]}')
 
 
     
     notify('Generacion de listas de arcos (sin cosmicos)')
 
-
+    task_verifier = task_checker(10,RS)
     if RS['10'][0] == False:
         try:
             list_generator(FOLDER=f'{work_dir}ARCS', 
@@ -102,15 +114,21 @@ def ARCOS(work_dir):
         except:
             RS['10'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['10'][1]}')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['10'][1]} porque hay tareas anteriores pendientes.')
 
 
 
     notify('Comienza la remocion de cosmicos de los Arcos ')
 
 
-
+    task_verifier = task_checker(11,RS)
     if RS['11'][0] == True:
         notify('Ya se removieron los cosmicos de los arcos')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['11'][1]} porque hay tareas anteriores pendientes.')
     else:
         try:
             notify('Empieza el bucle para remover cosmicos de los arcos...')
@@ -128,7 +146,8 @@ def ARCOS(work_dir):
         except:
             RS['11'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)            
-
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['11'][1]}')
 
 
 

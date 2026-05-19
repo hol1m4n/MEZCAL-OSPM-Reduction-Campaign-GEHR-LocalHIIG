@@ -5,6 +5,7 @@ from utils import notify
 from utils import guardar_logfile
 from utils import list_generator
 from utils import Plotganizer
+from utils import task_checker
 import os
 from astropy.io import fits
 import numpy as np
@@ -22,10 +23,22 @@ def ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir):
     iraf.twodspec()
     iraf.apextract()
 
+
+    task_verifier = task_checker(20,RS)
     if RS['20'][0] == True:
         notify('Ya se realizo la conversion a 1D de los objetos calibrados. Se pueden revisar y/o combinar')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['20'][1]} porque hay tareas anteriores pendientes.')
     else:
         try:
+
+            notify('RECORDAR ESCOGER TODA LA FORMA DE LA GAUSSIANA EN LA APERTURA!!!!')
+
+            notify('RECORDAR AJUSTAR EL BACKGROUND CON b :sample f!!!!')
+
+            notify('RECORDAR BORRAR PUNTOS MALOS DE LA TRAZA PARA AJUSTAR BIEN EL POLINOMIO DE SEGUIMIENTO!!!!')
+
+
             obj_files = [f for f in os.listdir(f'{work_dir}OBJS') if f.endswith(".fits") and 'wlcal' in f.lower()]
             obj_files.sort()
 
@@ -45,6 +58,10 @@ def ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir):
             print(ls_tmp)
             print(ls_unique)
             print(ls_match)
+
+            #Temporary arragement
+
+            obj_files = [f for f in obj_files if 'n7331' in f.lower()]
 
 
             for spec in obj_files:
@@ -126,15 +143,18 @@ def ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir):
         except:
             RS['20'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)            
-    
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['20'][1]}')    
 
 
 
     notify('Ploteando espectros 1D extraidos')
 
-
+    task_verifier = task_checker(21,RS)
     if RS['21'][0] == True:
         notify('Los espectros 1D extraidos ya estan ploteados')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['21'][1]} porque hay tareas anteriores pendientes.')
     else:
         try:
             dest = os.path.join(work_dir, "Redux")
@@ -185,4 +205,6 @@ def ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir):
             guardar_logfile(f'{work_dir}/log_reduc',RS)
         except:
             RS['21'][0] = False
-            guardar_logfile(f'{work_dir}/log_reduc',RS)             
+            guardar_logfile(f'{work_dir}/log_reduc',RS)
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['21'][1]}')             

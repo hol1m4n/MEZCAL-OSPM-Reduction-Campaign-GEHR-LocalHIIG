@@ -33,7 +33,7 @@ Configuration
 HA_CENTER_REST = 6577   # Å  rest-frame Hα
 REDSHIFT       = 0.0       # set your galaxy redshift if needed
 WINDOW_A       = 12.0      # ± Å around Hα centre used for fitting
-N_MC           = 1000      # Monte Carlo iterations for error estimation
+N_MC           = 5000      # Monte Carlo iterations for error estimation
 OUTPUT_CSV     = "halpha_fwhm_results.csv"
 SAVE_FIGS      = True      # save one PNG per spectrum
 # ══════════════════════════════════════════════════════════════════════════════

@@ -5,6 +5,7 @@ from utils import notify
 from utils import guardar_logfile
 from utils import list_generator
 from utils import Plotganizer
+from utils import task_checker
 from scipy.ndimage import median_filter
 import numpy as np
 from astropy.io import fits
@@ -22,7 +23,7 @@ def MASTERFLAT(work_dir):
 
     notify('Generacion de listas de flats')
 
-
+    task_verifier = task_checker(4,RS)
     if RS['4'][0] == False:
         try:
             list_generator(FOLDER=f'{work_dir}FLATS', 
@@ -35,11 +36,22 @@ def MASTERFLAT(work_dir):
         except:
             RS['4'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['4'][1]}')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['4'][1]} porque hay tareas anteriores pendientes.')
 
 
 
+
+
+
+
+    task_verifier = task_checker(5,RS)
     if RS['5'][0] == True:
         notify('Los flats ya estan cortados con CCDPROC + masterbias')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['5'][1]} porque hay tareas anteriores pendientes.')
     else:
         try:
             notify('Cortando flats con CCDPROC + masterbias')
@@ -81,13 +93,24 @@ def MASTERFLAT(work_dir):
         except:
             RS['5'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['5'][1]}')
 
 
 
 
 
+
+
+
+
+
+
+    task_verifier = task_checker(6,RS)
     if RS['6'][0] == True:
         notify('El masterflat existe')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['6'][1]} porque hay tareas anteriores pendientes.')
     else:
         try:
             notify('Creando el masterflat')
@@ -120,7 +143,8 @@ def MASTERFLAT(work_dir):
         except:
             RS['6'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)            
-
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['6'][1]}')
 
 
 
@@ -130,8 +154,15 @@ def MASTERFLAT(work_dir):
     iraf.set(stdgraph="xgterm")
 
 
+
+
+
+
+    task_verifier = task_checker(7,RS)
     if RS['7'][0] == True:
         notify('El masterflat normalizado existe')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['7'][1]} porque hay tareas anteriores pendientes.')
     else:
         try:
             notify('Enmascarando la fuga de luz... ')
@@ -204,7 +235,8 @@ def MASTERFLAT(work_dir):
         except:
             RS['7'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)
-
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['7'][1]}')
 
 
 

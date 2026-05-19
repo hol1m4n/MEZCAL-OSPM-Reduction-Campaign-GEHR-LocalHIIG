@@ -21,7 +21,7 @@ from summary_plots import summary_plotter
 
 notify('START',mode='M')
 
-work_dir = '/home/hollman/GEHR_specs/2023jun_spm/nite02/'
+work_dir = '/home/hollman/GEHR_specs/2023jun_spm/nite06/'
 
 
 notify(f'Trabajando en {work_dir}')
@@ -43,8 +43,11 @@ ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir)
 
 notify('END',mode='M')
 
-plotear_resumen = True
 
+
+
+RS = leer_o_crear_logfile(f'{work_dir}/log_reduc') # Se lee nuevamente el log_reduc y si todo termino con exito entonces ahora si se plotea el summary
+plotear_resumen = all(valor[0] is True for valor in RS.values())
 if plotear_resumen:
     summary_plotter(work_dir)
 

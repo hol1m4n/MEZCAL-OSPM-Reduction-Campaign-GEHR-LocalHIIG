@@ -3,6 +3,8 @@ from pyraf import gki
 from utils import leer_o_crear_logfile
 from utils import notify
 from utils import guardar_logfile
+from utils import task_checker
+
 
 
 def SET_INSTRUMENT(work_dir):
@@ -18,9 +20,11 @@ def SET_INSTRUMENT(work_dir):
     notify('Fijar el instrumento para CCDPROC')
 
 
-
+    task_verifier = task_checker(0,RS)
     if RS['0'][0] == True:
         notify('Ya esta cargado el instrumento')
+    elif not task_verifier:
+        notify(f'No se puede correr la tarea {RS['0'][1]} porque hay tareas anteriores pendientes.')
     else:
         try:
             notify('Fijar el instrumento y salir')
@@ -30,3 +34,5 @@ def SET_INSTRUMENT(work_dir):
         except:
             RS['0'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)
+            notify(f'X X X',mode='M')
+            notify(f'Hubo un fallo en la tarea {RS['0'][1]}')
