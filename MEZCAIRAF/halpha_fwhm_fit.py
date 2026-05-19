@@ -30,10 +30,10 @@ Configuration
 # ══════════════════════════════════════════════════════════════════════════════
 #  CONFIGURATION  ─ edit these values for your dataset
 # ══════════════════════════════════════════════════════════════════════════════
-HA_CENTER_REST = 6562.80   # Å  rest-frame Hα
+HA_CENTER_REST = 6561   # Å  rest-frame Hα
 REDSHIFT       = 0.0       # set your galaxy redshift if needed
-WINDOW_A       = 10.0      # ± Å around Hα centre used for fitting
-N_MC           = 10000      # Monte Carlo iterations for error estimation
+WINDOW_A       = 12.0      # ± Å around Hα centre used for fitting
+N_MC           = 1000      # Monte Carlo iterations for error estimation
 OUTPUT_CSV     = "halpha_fwhm_results.csv"
 SAVE_FIGS      = True      # save one PNG per spectrum
 # ══════════════════════════════════════════════════════════════════════════════
@@ -52,6 +52,7 @@ import matplotlib.gridspec as gridspec
 
 from astropy.io import fits
 from scipy.optimize import curve_fit
+import argparse
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -282,10 +283,11 @@ def make_figure(wave_full, flux_full,
 
     # ── Main panel ──────────────────────────────────────────────────────────
     ax_main.errorbar(wave_win, flux_win, yerr=sigma_noise,
-                     fmt="k.", ms=3.5, elinewidth=0.7, capsize=0,
-                     label="Data", zorder=2)
-    ax_main.plot(wave_fine, fit_g_fine,  "b--", lw=2.0, label="Gaussian",      zorder=4)
-    ax_main.plot(wave_fine, fit_gh_fine, "r-",  lw=2.2, label="Gauss-Hermite", zorder=5)
+                     fmt="k.", ms=0.1, elinewidth=0.7, capsize=0,
+                      zorder=2)
+    ax_main.step(wave_win, flux_win,lw=0.5,color='k',label="Data")
+    ax_main.plot(wave_fine, fit_g_fine,  "b--", lw=1.0, label="Gaussian",      zorder=4, alpha=0.5)
+    ax_main.plot(wave_fine, fit_gh_fine, "r-",  lw=1.2, label="Gauss-Hermite", zorder=5, alpha=0.5)
     ax_main.axhline(popt_g[-1], color="green", ls="--", lw=1.2,
                     label="Continuum", zorder=3)
     ax_main.axhline(0, color="gray", ls=":", lw=0.8, zorder=1)
@@ -344,7 +346,7 @@ def make_figure(wave_full, flux_full,
         ax.legend(fontsize=8.5, framealpha=0.9)
 
     if save_path:
-        plt.savefig(save_path, dpi=150, bbox_inches="tight")
+        plt.savefig(save_path, dpi=80, bbox_inches="tight")
         print(f"    Figure → {save_path}")
     plt.close(fig)
 
@@ -600,9 +602,20 @@ def batch_fit(file_list,
 # ─────────────────────────────────────────────────────────────────────────────
 # 9.  Entry point
 # ─────────────────────────────────────────────────────────────────────────────
-
+'''
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--spectra", type=str, help="Linea a ajustar")
+    parser.add_argument("--line_center", type=str, help="Linea a ajustar")
+    
+    args = parser.parse_args()
+
+
     ha_obs = HA_CENTER_REST * (1.0 + REDSHIFT)
+
+    ha_obs = args.line_center
+    files = args.spectra
+
 
     if len(sys.argv) > 1:
         # Single file passed on the command line
@@ -625,4 +638,53 @@ if __name__ == "__main__":
         n_mc       = N_MC,
         output_csv = OUTPUT_CSV,
         save_figs  = SAVE_FIGS,
+    )
+'''
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    # 'nargs="+"' captura todos los archivos expandidos por el asterisco en una lista
+    parser.add_argument(
+        "--spectra",
+        nargs="+",
+        type=str,
+        help="Lista de archivos o patrón .fits a ajustar",
+    )
+    # Cambiado a type=float porque un centro de línea suele ser un número decimal
+    parser.add_argument(
+        "--line_center", type=float, help="Centro de la línea a ajustar"
+    )
+    args = parser.parse_args()
+
+    # 1. Procesar line_center (con un respaldo por si no se pasa el argumento)
+    if args.line_center is not None:
+        ha_obs = args.line_center
+    else:
+        ha_obs = HA_CENTER_REST * (1.0 + REDSHIFT)
+
+    # 2. Procesar los archivos de entrada (spectra)
+    if args.spectra:
+        # Si el usuario pasó archivos (ej: usando --spectra *N4214A*.fits)
+        files = sorted(args.spectra)
+    else:
+        # Modo Batch automático si no se pasa --spectra: busca todos los .fits del directorio
+        files = sorted(glob.glob("*.fits"))
+
+    # 3. Validación de seguridad si el directorio está vacío
+    if not files:
+        print(
+            "No *.fits files found.\n"
+            "Usage: python halpha_fwhm_fit.py --spectra <spectrum.fits> [--line_center 6569.76]\n"
+            "   or: python halpha_fwhm_fit.py (to run all .fits in the current directory)"
+        )
+        sys.exit(1)
+
+    # 4. Llamada a la función
+    batch_fit(
+        file_list=files,
+        ha_center=ha_obs,
+        window_A=WINDOW_A,
+        n_mc=N_MC,
+        output_csv=OUTPUT_CSV,
+        save_figs=SAVE_FIGS,
     )

@@ -14,7 +14,7 @@ import matplotlib.gridspec as gridspec
 from astropy.io import fits
 from pathlib import Path
 import os, glob
-
+import shutil
 # ─────────────────────────────────────────────
 # PASO 3 — MASTERBIAS
 # Qué buscar: perfil plano, histograma angosto, sin gradientes
@@ -557,3 +557,14 @@ def summary_plotter(work_dir):
     diag_post_transform(work_dir)
 
     #diag_1d_spectra(work_dir)
+
+    dest = os.path.join(work_dir, "Sigma_fit")
+    os.makedirs(dest, exist_ok=True)
+
+    onedspec_redux = [f for f in os.listdir(f'{work_dir}OBJS') if f.endswith(".fits") and '1d' in f.lower()]
+    onedspec_redux.sort()
+
+    for spec in onedspec_redux:
+        shutil.copy(str(f'{work_dir}OBJS/{spec}'),str(f'{work_dir}Sigma_fit/{spec}'))
+
+    shutil.copy(str(f'/home/hollman/GEHR_specs/halpha_fwhm_fit.py'),str(f'{work_dir}Sigma_fit/halpha_fwhm_fit.py'))
