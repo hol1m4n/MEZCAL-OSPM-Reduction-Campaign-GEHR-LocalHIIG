@@ -195,7 +195,7 @@ def ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir):
                     fig.savefig((ruta_fits.replace('.fits', '.png')).replace('OBJS','Redux'),dpi=80)
                     plt.close(fig)
 
-            _1D = [f for f in os.listdir(f'{work_dir}OBJS') if f.endswith(".fits") and '1d' in f.lower()]
+            _1D = [f for f in os.listdir(f'{work_dir}OBJS') if f.endswith(".fits") and '_1d' in f.lower()]
             _1D.sort()
 
             for spec in _1D:

@@ -561,7 +561,7 @@ def summary_plotter(work_dir):
     dest = os.path.join(work_dir, "Sigma_fit")
     os.makedirs(dest, exist_ok=True)
 
-    onedspec_redux = [f for f in os.listdir(f'{work_dir}OBJS') if f.endswith(".fits") and '1d' in f.lower()]
+    onedspec_redux = [f for f in os.listdir(f'{work_dir}OBJS') if f.endswith(".fits") and '_1d' in f.lower()]
     onedspec_redux.sort()
 
     for spec in onedspec_redux:

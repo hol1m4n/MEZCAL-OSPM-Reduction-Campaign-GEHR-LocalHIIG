@@ -116,7 +116,7 @@ def WAVELENGHT_CALIBRATION(work_dir):
                     graphics = "stdgraph"
                 )                
 
-                if len(grupo_n) > 1:
+                if len(grupo_n) >= 1:
                     with open(f'{work_dir}ARCS/reidentify_{G+1}', "w") as reidentify_list:
                         for i in grupo_n:
                             reidentify_list.write(f'{i} \n')
