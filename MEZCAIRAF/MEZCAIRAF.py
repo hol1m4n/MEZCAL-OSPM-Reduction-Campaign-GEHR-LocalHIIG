@@ -21,7 +21,7 @@ from summary_plots import summary_plotter
 
 notify('START',mode='M')
 
-work_dir = '/home/hollman/GEHR_specs/2023jun_spm/nite06/'
+work_dir = '/home/hollman/GEHR_specs/2024mar_spm/nite03/'
 
 
 notify(f'Trabajando en {work_dir}')

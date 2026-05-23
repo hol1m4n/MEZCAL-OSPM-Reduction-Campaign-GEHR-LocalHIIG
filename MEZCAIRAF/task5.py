@@ -157,6 +157,16 @@ def WAVELENGHT_CALIBRATION(work_dir):
             notify(f'Hubo un fallo en la tarea {RS['16'][1]}')
 
 
+
+
+
+
+
+
+
+
+
+
     notify('Comienza la seccion de FITCOORDS...')
 
     task_verifier = task_checker(17,RS)
@@ -197,7 +207,8 @@ def WAVELENGHT_CALIBRATION(work_dir):
             RS['17'][0] = True
             guardar_logfile(f'{work_dir}/log_reduc',RS)
 
-            fitcoords_status = input('Fitcoords salio bien?(y/n)')
+            notify('Check FITCOORDS status!!!!')
+            fitcoords_status = input('Fitcoords salio bien?(y/n):  ')
 
             if fitcoords_status == 'y':
                 RS['17'][0] = True
@@ -205,8 +216,8 @@ def WAVELENGHT_CALIBRATION(work_dir):
             if fitcoords_status == 'n':
                 RS['17'][0] = False
                 guardar_logfile(f'{work_dir}/log_reduc',RS)
-                notify(f'X X X',mode='M')
-                notify(f'Hubo un fallo en la tarea {RS['17'][1]}')
+                notify(f': (',mode='M')
+                notify(f'Se volvera a intentar la tarea {RS['17'][1]}')
 
 
         except:
@@ -214,6 +225,12 @@ def WAVELENGHT_CALIBRATION(work_dir):
             guardar_logfile(f'{work_dir}/log_reduc',RS)            
             notify(f'X X X',mode='M')
             notify(f'Hubo un fallo en la tarea {RS['17'][1]}')
+
+
+
+
+
+
 
 
     notify('Comienza la seccion de TRANSFORM para arcos...')
@@ -254,9 +271,9 @@ def WAVELENGHT_CALIBRATION(work_dir):
             notify(f'Hubo un fallo en la tarea {RS['18'][1]}')
 
 
-    notify('Comienza la seccion de TRANSFORM para objetos...')
 
-    
+
+
 
 
     try:
@@ -266,6 +283,21 @@ def WAVELENGHT_CALIBRATION(work_dir):
     except:
         notify('El archivo association no se encuentra ni el directorio de trabajo ni en la carpeta OBJS. Crear el objeto o moverlo al directorio.Se tiene que ingresar la tabla con el match entre Arcos y Objetos. Previamente se debe haber copiado la carpeta database a OBJS')
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    notify('Comienza la seccion de TRANSFORM para objetos...')
 
     task_verifier = task_checker(19,RS)
     if RS['19'][0] == True:
@@ -307,22 +339,16 @@ def WAVELENGHT_CALIBRATION(work_dir):
 
                         print('\n')
 
+
             os.chdir(original_dir)
             Plotganizer(work_dir).png_x_folder()
             RS['19'][0] = True
             guardar_logfile(f'{work_dir}/log_reduc',RS)
         except:
             RS['19'][0] = False
-            guardar_logfile(f'{work_dir}/log_reduc',RS)
+            guardar_logfile(f'{work_dir}/log_reduc',RS)            
             notify(f'X X X',mode='M')
             notify(f'Hubo un fallo en la tarea {RS['19'][1]}')
-
-
-
-
-
-
-
 
 
 

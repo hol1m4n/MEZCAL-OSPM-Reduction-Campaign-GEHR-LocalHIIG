@@ -61,7 +61,7 @@ def ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir):
 
             #Temporary arragement
 
-            #obj_files = [f for f in obj_files if 'n7331' in f.lower()]
+            #obj_files = [f for f in obj_files if 'm66c0003' in f.lower()]
 
 
             for spec in obj_files:
