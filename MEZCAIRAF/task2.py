@@ -171,7 +171,11 @@ def MASTERFLAT(work_dir):
                 header = hdul[0].header
 
             fuga_mask = np.zeros(data.shape, dtype=bool)
-            fuga_mask[:,220:310] = True  # Para la noche 5 del 2022 mar hubo que correrlo un poco a la derecha :,265:322. El original que estaba usando era: :,275:332
+            fuga_mask[:,275:335] = True  
+
+            # 2023 junio [275:335] N1
+
+            # Para la noche 5 del 2022 mar hubo que correrlo un poco a la derecha :,265:322. El original que estaba usando era: :,275:332
             # Noche N1 de 2023 nov tambien cambia a 240:315
             # Noche N2 de 2023 nov tambien cambia a 240:327
             # Noche N3 de 2024 mar tambien cambia a 220:310

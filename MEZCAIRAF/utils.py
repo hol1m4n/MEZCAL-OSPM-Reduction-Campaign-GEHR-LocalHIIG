@@ -196,16 +196,17 @@ def list_generator(FOLDER=os.getcwd(), List_in='', List_out='', out_key='',img_t
 
 def leer_o_crear_logfile(ruta):
     dict_nulo = {
-        '0': [False, ' Set instrument'],
-        '1': [False, ' Bias list'],
-        '2': [False, ' Bias ccdproc'],
-        '3': [False, ' Masterbias'],
-        '4': [False, ' Flat list'],
-        '5': [False, ' Flat ccdproc'],
-        '6': [False, ' Masterflat'],
-        '7': [False, ' Normalize flat'],
-        '8': [False, ' Arc list'],
-        '9': [False, ' Arc ccdproc'],
+        '-1': [False,' Mirror creation'],
+        '0':  [False, ' Set instrument'],
+        '1':  [False, ' Bias list'],
+        '2':  [False, ' Bias ccdproc'],
+        '3':  [False, ' Masterbias'],
+        '4':  [False, ' Flat list'],
+        '5':  [False, ' Flat ccdproc'],
+        '6':  [False, ' Masterflat'],
+        '7':  [False, ' Normalize flat'],
+        '8':  [False, ' Arc list'],
+        '9':  [False, ' Arc ccdproc'],
         '10': [False, ' Arc cr list'],
         '11': [False, ' Arc cosmic removal'],
         '12': [False, ' Obj list'],
@@ -250,7 +251,7 @@ def guardar_logfile(ruta, diccionario):
 
 def task_checker(task,log_dict):
     current_task = task
-    previous_tasks = [str(i) for i in range(0, current_task)]
+    previous_tasks = [str(i) for i in range(-1, current_task)]
     task_verifier = all(log_dict.get(t, [False])[0] is True for t in previous_tasks)
     return task_verifier    
 

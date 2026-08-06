@@ -109,6 +109,7 @@ def diag_flats(work_dir):
         fig.suptitle('FlatNmaster final — verificación', fontsize=13)
 
         axes[0].hist(data.flatten(), bins=300, color='steelblue', edgecolor='none')
+        axes[0].set_xlim(0.5, 1.5)
         axes[0].axvline(1.0, color='r', linestyle='--', label='Ideal = 1.0')
         axes[0].set_xlabel('Valor del píxel')
         axes[0].set_ylabel('N píxeles')
@@ -287,8 +288,8 @@ def diag_wl_calibration(work_dir):
     fig, axes = plt.subplots(2, 1, figsize=(max(10, len(resultados)*0.8), 8))
     fig.suptitle('Calidad de la calibración en longitud de onda', fontsize=13)
 
-    axes[0].bar(range(len(nombres)), rms_vals, color=['green' if r < 0.3 else 'red' for r in rms_vals])
-    axes[0].axhline(0.3, color='r', linestyle='--', label='Límite recomendado 0.3 Å')
+    axes[0].bar(range(len(nombres)), rms_vals, color=['green' if r < 0.1 else 'red' for r in rms_vals])
+    axes[0].axhline(0.1, color='r', linestyle='--', label='Límite recomendado 0.1 Å')
     axes[0].set_xticks(range(len(nombres)))
     axes[0].set_xticklabels(nombres, rotation=45, ha='right', fontsize=7)
     axes[0].set_ylabel('RMS (Å)')
@@ -537,7 +538,7 @@ def summary_plotter(work_dir):
 
     notify('PLOTS',mode='M')
     notify('DE',mode='M')
-    notify('CLAUDE',mode='M')
+    notify('RESUMEN',mode='M')
 
     dest = os.path.join(work_dir, "Summary")
     os.makedirs(dest, exist_ok=True)
@@ -567,4 +568,4 @@ def summary_plotter(work_dir):
     for spec in onedspec_redux:
         shutil.copy(str(f'{work_dir}OBJS/{spec}'),str(f'{work_dir}Sigma_fit/{spec}'))
 
-    shutil.copy(str(f'/home/hollman/GEHR_specs/halpha_fwhm_fit.py'),str(f'{work_dir}Sigma_fit/halpha_fwhm_fit.py'))
+    #shutil.copy(str(f'/home/hollman/GEHR_specs/halpha_fwhm_fit.py'),str(f'{work_dir}Sigma_fit/halpha_fwhm_fit.py'))

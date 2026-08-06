@@ -16,12 +16,16 @@ from task4 import SPECS
 from task5 import WAVELENGHT_CALIBRATION
 from task6 import ONE_DIMENTIONAL_SPECTRUM_EXTRACT
 
+
+from sky_mirror import MIRROR_CREATOR 
 from summary_plots import summary_plotter 
+from FWHM_fit_sigma import sigma_runner
 
+notify('START REDUX',mode='M')
 
-notify('START',mode='M')
-
-work_dir = '/home/hollman/GEHR_specs/2024mar_spm/nite03/'
+# work_dir = '/home/hollman/GEHR_specs/2023_JUNIO/nite01/'
+# work_dir = '/home/hollman/GEHR_specs/2023_JUNIO/nite02/'
+work_dir = '/home/hollman/GEHR_specs/2023_JUNIO/nite03/'
 
 
 notify(f'Trabajando en {work_dir}')
@@ -33,6 +37,8 @@ Plotganizer(work_dir).png_x_folder()
 RS = leer_o_crear_logfile(f'{work_dir}/log_reduc')
 
 
+MIRROR_CREATOR(work_dir)
+
 SET_INSTRUMENT(work_dir)
 MASTERBIAS(work_dir)
 MASTERFLAT(work_dir)
@@ -41,9 +47,10 @@ SPECS(work_dir)
 WAVELENGHT_CALIBRATION(work_dir)
 ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir)
 
-notify('END',mode='M')
+notify('END REDUX',mode='M')
 
 
+notify('-------------',mode='M')
 
 
 RS = leer_o_crear_logfile(f'{work_dir}/log_reduc') # Se lee nuevamente el log_reduc y si todo termino con exito entonces ahora si se plotea el summary
@@ -51,9 +58,16 @@ plotear_resumen = all(valor[0] is True for valor in RS.values())
 if plotear_resumen:
     summary_plotter(work_dir)
 
-    
 
+notify('SIGMAS',mode='M')
 
+calcular_sigmas = all(valor[0] is True for valor in RS.values())
+if calcular_sigmas:
+    sigma_bool = input('Calcular sigmas para esta noche?(y/n):   ')
+    if sigma_bool == 'y':
+        print('Continuamos...') 
+
+        sigma_runner(work_dir)
 
 
 

@@ -43,37 +43,8 @@ def WAVELENGHT_CALIBRATION(work_dir):
             arc_files = [f for f in os.listdir(f'{work_dir}ARCS') if f.endswith(".fits") and 'cr' in f.lower()]
             arc_files.sort()
 
-            '''
-            integ_ = 4
-            grupos = (len(arc_files) + integ_ - 1) // integ_ # tres el numero de integrantes por grupo
 
-            for G in range(grupos):
-                grupo_n = []
-                for i in range(integ_):
-                    grupo_n.append(G * integ_ + i)
-                chosen = random.choice(grupo_n)
-                grupo_n.remove(chosen)
-                print(grupo_n, chosen)
-                with open(f'Wl_calG{G+1}', "w") as wave_calibra_group: #{work_dir}ARCS/
-                    for i in grupo_n:
-                        wave_calibra_group.write(f'{arc_files[i]} \n')  #{work_dir}ARCS/
-            
-
-            mv_cal_groups = [f for f in os.listdir(f'{work_dir}') if 'waveleng_calg' in f.lower()]
-            mv_cal_groups.sort()
-
-            WL_cal_groups = [f for f in os.listdir(f'{work_dir}ARCS') if 'waveleng_calg' in f.lower()]
-
-            if len(mv_cal_groups) == 0 and len(WL_cal_groups) == 0:
-                #notify('No hay grupos de arcos para la calibracion de longitud de onda, crearlos o moverlos.')
-            #elif len(mv_cal_groups) > 0 and len(WL_cal_groups) == 0:
-                for e in mv_cal_groups:
-                    ruta_wlcal_file = os.path.join(f'{work_dir}ARCS/', f'{e}')
-                    shutil.move(str(f'{work_dir}{e}'), str(ruta_wlcal_file))
-
-            '''
-
-            wlcal_start = input('Ya se movieron los archivos waveleng_calg a ARCS?(y/n)')
+            wlcal_start = input('Ya se movieron los archivos waveleng_calg a la carpeta ARCS?(y/n):   ')
             if wlcal_start == 'y':
                 print('Continuamos...')         
 
@@ -91,6 +62,161 @@ def WAVELENGHT_CALIBRATION(work_dir):
                 grupo_n.remove(chosen) # Aqui se remueve el primero que es con el que se calibra
                 print(grupo_n, chosen,"\n")
 
+
+                iraf.noao()
+                iraf.onedspec()
+
+                iraf.unlearn("aidpars")
+                iraf.unlearn("autoidentify")
+
+                iraf.aidpars(
+                    reflist    = "linelists$thar.dat",
+                    refspec    = "",
+
+                    # INDEF significa el píxel central del espectro
+                    crpix      = "INDEF",
+                    crquad     = "INDEF",
+
+                    # Buscar ambas orientaciones de la dispersión
+                    cddir      = "decreasing",
+
+                    # Búsqueda amplia del cero puntual
+                    crsearch   = 15.0,
+
+                    # -0.5 significa ±50% del valor inicial de cdelt
+                    cdsearch   = -0.5,
+
+                    ntarget    = 15,
+                    npattern   = 3,
+                    nneighbors = 10,
+                    nbins      = 10,
+                    ndmax      = 500,
+
+                    # Primero intenta una relación lineal
+                    aidord     = 2,
+                    maxnl      = 0.05,
+
+                    # No exigir las seis líneas desde el comienzo
+                    nfound     = 4,
+
+                    sigma      = 0.20,
+                    minratio   = 0.03,
+
+                    # Criterios deliberadamente permisivos para diagnóstico
+                    rms        = 0.3,
+                    fmatch     = 0.80,
+
+                    # b: límites, t: picos detectados, f: solución final
+                    debug      = "btf",
+
+                    mode       = "ql"
+                )
+
+                with open(f"{work_dir}ARCS/database/id{chosen.replace('.fits', '')}", "w", encoding="ascii") as f:
+                    pass
+
+                iraf.autoidentify(
+                    images      = f'{chosen}',
+
+                    # Coordenada aproximada en el centro del espectro
+                    crval       = 6580.0,
+
+                    # Solo la magnitud; cddir="unknown" busca ambos sentidos
+                    cdelt       = -0.055,
+
+                    query       = "no",
+                    coordlist   = "linelists$thar.dat",
+                    units       = "angstroms",
+
+                    interactive = "YES",
+
+                    section     = "middle line",
+                    nsum        = 10,
+
+                    ftype       = "emission",
+
+                    # Valores permisivos para detectar primero los picos
+                    fwidth      = 5.0,
+                    cradius     = 3.0,
+                    threshold   = 0.0,
+                    minsep      = 1.0,
+
+                    # En píxeles por ser negativo
+                    match       = -5.0,
+
+                    # Solución lineal inicial
+                    function    = "spline3",
+                    order       = 1,
+
+                    sample      = "*",
+                    niterate    = 1,
+                    low_reject  = 3.0,
+                    high_reject = 3.0,
+                    grow        = 0.0,
+
+                    dbwrite     = "yes",
+                    overwrite   = "yes",
+                    database    = f"database",
+
+                    verbose     = "yes",
+                    logfile     = "autoidentify.log",
+                    plotfile    = ""
+                )
+
+                chosen_root = chosen.replace(".fits", "")
+
+                iraf.reidentify(
+                    reference   = chosen_root,
+
+                    # Vacío: primero traza las líneas dentro del propio arco referencia
+                    images      = "",
+
+                    interactive = "no",
+                    section     = "middle line",
+
+                    newaps      = "yes",
+                    override    = "yes",
+                    refit       = "yes",
+
+                    # Fundamental para seguir la curvatura
+                    trace       = "yes",
+
+                    # Para una curvatura fuerte comienza con pasos pequeños
+                    step        = 5,
+                    nsum        = 5,
+
+                    # Al trazar, usa como referencia la fila anterior
+                    shift       = 0.0,
+                    search      = 0.0,
+
+                    # No detener todo el trazado porque se pierda una línea
+                    nlost       = 3,
+
+                    # Debe superar el desplazamiento entre dos pasos consecutivos
+                    cradius     = 6.0,
+                    threshold   = 0.0,
+
+                    addfeatures = "no",
+                    coordlist   = "linelists$thar.dat",
+                    match       = -3.0,
+                    maxfeatures = 50,
+                    minsep      = 2.0,
+
+                    database    = "database",
+                    logfiles    = f"trace_reference_G{G+1}.log",
+                    plotfile    = f"trace_reference_G{G+1}.plot",
+                    verbose     = "yes",
+                    graphics    = "stdgraph"
+                )
+
+
+
+
+
+
+                # Vamos a cambiar de usar indetify a autoidentify 
+
+                '''
                 iraf.identify(
                     images = f'{chosen}', #{work_dir}ARCS/
                     section = "middle line",
@@ -115,12 +241,64 @@ def WAVELENGHT_CALIBRATION(work_dir):
                     autowrite = "yes",
                     graphics = "stdgraph"
                 )                
+                '''
+
+
+                iraf.noao()
+                iraf.twodspec()
+                iraf.longslit()
+
+
 
                 if len(grupo_n) >= 1:
                     with open(f'{work_dir}ARCS/reidentify_{G+1}', "w") as reidentify_list:
                         for i in grupo_n:
                             reidentify_list.write(f'{i} \n')
 
+                    iraf.reidentify(
+                        reference   = chosen_root,
+                        images      = f'@reidentify_{G+1}',
+
+                        interactive = "no",
+                        section     = "middle line",
+
+                        newaps      = "yes",
+                        override    = "yes",
+                        refit       = "yes",
+
+                        # El arco referencia ya tiene múltiples filas identificadas
+                        trace       = "no",
+
+                        step        = 5,
+                        nsum        = 5,
+
+                        # Busca automáticamente pequeños desplazamientos entre arcos
+                        shift       = "INDEF",
+                        search      = "INDEF",
+
+                        nlost       = 3,
+                        cradius     = 6.0,
+                        threshold   = 0.0,
+
+                        addfeatures = "no",
+                        coordlist   = "linelists$thar.dat",
+                        match       = -3.0,
+                        maxfeatures = 50,
+                        minsep      = 2.0,
+
+                        database    = "database",
+                        logfiles    = f"reidentify_G{G+1}.log",
+                        plotfile    = f"reidentify_G{G+1}.plot",
+                        verbose     = "yes",
+                        graphics    = "stdgraph"
+                    )
+
+
+
+
+
+
+                    '''
                     iraf.reidentify(reference = f'{chosen}', # {work_dir}ARCS/
                         images = f'@reidentify_{G+1}', #{work_dir}ARCS/
                         interactive = "no",
@@ -146,6 +324,8 @@ def WAVELENGHT_CALIBRATION(work_dir):
                         verbose = "yes",
                         graphics = "stdgraph"
                     )
+                    '''
+
 
             os.chdir(original_dir)
             RS['16'][0] = True
@@ -163,7 +343,9 @@ def WAVELENGHT_CALIBRATION(work_dir):
 
 
 
-
+    iraf.noao()
+    iraf.twodspec()
+    iraf.longslit()
 
 
 
