@@ -13,7 +13,7 @@ from task1 import MASTERBIAS
 from task2 import MASTERFLAT
 from task3 import ARCOS
 from task4 import SPECS
-from task5 import WAVELENGHT_CALIBRATION
+from task5 import WAVELENGTH_CALIBRATION
 from task6 import ONE_DIMENTIONAL_SPECTRUM_EXTRACT
 
 
@@ -25,7 +25,22 @@ notify('START REDUX',mode='M')
 
 # work_dir = '/home/hollman/GEHR_specs/2023_JUNIO/nite01/'
 # work_dir = '/home/hollman/GEHR_specs/2023_JUNIO/nite02/'
-work_dir = '/home/hollman/GEHR_specs/2023_JUNIO/nite03/'
+# work_dir = '/home/hollman/GEHR_specs/2023_JUNIO/nite03/'
+# work_dir = '/home/hollman/GEHR_specs/2023_JUNIO/nite04/'
+# work_dir = '/home/hollman/GEHR_specs/2023_JUNIO/nite05/'
+# work_dir = '/home/hollman/GEHR_specs/2023_JUNIO/nite06/'
+
+# work_dir = '/home/hollman/GEHR_specs/2022_MARZO/nite1/'
+# work_dir = '/home/hollman/GEHR_specs/2022_MARZO/nite2/'
+# work_dir = '/home/hollman/GEHR_specs/2022_MARZO/nite3/'
+# work_dir = '/home/hollman/GEHR_specs/2022_MARZO/nite4/'
+# work_dir = '/home/hollman/GEHR_specs/2022_MARZO/nite5/'
+
+# work_dir = '/home/hollman/GEHR_specs/2023_NOVIEMBRE/nite01/'
+# work_dir = '/home/hollman/GEHR_specs/2023_NOVIEMBRE/nite02/'
+
+work_dir = '/home/hollman/GEHR_specs/2024_MARZO/nite03/'
+
 
 
 notify(f'Trabajando en {work_dir}')
@@ -44,7 +59,7 @@ MASTERBIAS(work_dir)
 MASTERFLAT(work_dir)
 ARCOS(work_dir)
 SPECS(work_dir)
-WAVELENGHT_CALIBRATION(work_dir)
+WAVELENGTH_CALIBRATION(work_dir)
 ONE_DIMENTIONAL_SPECTRUM_EXTRACT(work_dir)
 
 notify('END REDUX',mode='M')

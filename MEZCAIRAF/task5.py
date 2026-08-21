@@ -11,10 +11,29 @@ import random
 import shutil
 import ast
 
-def WAVELENGHT_CALIBRATION(work_dir):
+def WAVELENGTH_CALIBRATION(work_dir):
 
     notify('WL CAL',mode='M')
     RS = leer_o_crear_logfile(f'{work_dir}/log_reduc')
+
+
+    wavelength_calib_groups = [f for f in os.listdir(f'{work_dir}ARCS') if 'waveleng_calg' in f.lower()]
+
+    if len(wavelength_calib_groups) == 0:
+        move_wave_calibs_groups = [f for f in os.listdir(f'{work_dir}') if 'waveleng_calg' in f.lower()]
+
+        if len(move_wave_calibs_groups) == 0:
+            wlcal_start = input('Ya se movieron los archivos waveleng_calg a la carpeta principal?(y/n):   ')
+            if wlcal_start == 'y':
+                print('Continuamos...')
+
+        for wave_file in move_wave_calibs_groups:
+            shutil.move(str(os.path.join(f'{work_dir}',wave_file)), str(os.path.join(f'{work_dir}ARCS',wave_file)))
+
+
+
+
+
 
     iraf.noao()
     iraf.twodspec()
@@ -44,220 +63,187 @@ def WAVELENGHT_CALIBRATION(work_dir):
             arc_files.sort()
 
 
-            wlcal_start = input('Ya se movieron los archivos waveleng_calg a la carpeta ARCS?(y/n):   ')
-            if wlcal_start == 'y':
-                print('Continuamos...')         
+         
 
             WL_cal_groups = [f for f in os.listdir(f'{work_dir}ARCS') if 'waveleng_calg' in f.lower()]
             WL_cal_groups.sort()
 
             for G in range(len(WL_cal_groups)):
-                grupo_n = []
-                with open(f'{work_dir}ARCS/WaveLeng_calG{G+1}', "r") as arc_individual:
-                    for line in arc_individual:
-                        #print(line)
-                        grupo_n.append(line.strip())
-                    #print("\n")
-                chosen = grupo_n[0] # For identify, the rest are reidentify 
-                grupo_n.remove(chosen) # Aqui se remueve el primero que es con el que se calibra
-                print(grupo_n, chosen,"\n")
+
+                notify(f'Comienza calibracion para WaveLeng_calG{G+1}')
+
+                wave_calib_status_check = 'n'
+
+                while wave_calib_status_check == 'n':
+
+                
+
+                    grupo_n = []
+                    with open(f'{work_dir}ARCS/WaveLeng_calG{G+1}', "r") as arc_individual:
+                        for line in arc_individual:
+                            #print(line)
+                            grupo_n.append(line.strip())
+                        #print("\n")
+                    chosen = grupo_n[0] # For identify, the rest are reidentify 
+                    grupo_n.remove(chosen) # Aqui se remueve el primero que es con el que se calibra
+                    print(grupo_n, chosen,"\n")
 
 
-                iraf.noao()
-                iraf.onedspec()
+                    iraf.noao()
+                    iraf.onedspec()
 
-                iraf.unlearn("aidpars")
-                iraf.unlearn("autoidentify")
+                    iraf.unlearn("aidpars")
+                    iraf.unlearn("autoidentify")
 
-                iraf.aidpars(
-                    reflist    = "linelists$thar.dat",
-                    refspec    = "",
+                    iraf.aidpars(
+                        reflist    = "linelists$thar.dat",
+                        refspec    = "",
 
-                    # INDEF significa el píxel central del espectro
-                    crpix      = "INDEF",
-                    crquad     = "INDEF",
+                        # INDEF significa el píxel central del espectro
+                        crpix      = "INDEF",
+                        crquad     = "INDEF",
 
-                    # Buscar ambas orientaciones de la dispersión
-                    cddir      = "decreasing",
+                        # Buscar ambas orientaciones de la dispersión
+                        cddir      = "decreasing",
 
-                    # Búsqueda amplia del cero puntual
-                    crsearch   = 15.0,
+                        # Búsqueda amplia del cero puntual
+                        crsearch   = 15.0,
 
-                    # -0.5 significa ±50% del valor inicial de cdelt
-                    cdsearch   = -0.5,
+                        # -0.5 significa ±50% del valor inicial de cdelt
+                        cdsearch   = -0.5,
 
-                    ntarget    = 15,
-                    npattern   = 3,
-                    nneighbors = 10,
-                    nbins      = 10,
-                    ndmax      = 500,
+                        ntarget    = 15,
+                        npattern   = 3,
+                        nneighbors = 10,
+                        nbins      = 10,
+                        ndmax      = 500,
 
-                    # Primero intenta una relación lineal
-                    aidord     = 2,
-                    maxnl      = 0.05,
+                        # Primero intenta una relación lineal
+                        aidord     = 2,
+                        maxnl      = 0.05,
 
-                    # No exigir las seis líneas desde el comienzo
-                    nfound     = 4,
+                        # No exigir las seis líneas desde el comienzo
+                        nfound     = 4,
 
-                    sigma      = 0.20,
-                    minratio   = 0.03,
+                        sigma      = 0.20,
+                        minratio   = 0.03,
 
-                    # Criterios deliberadamente permisivos para diagnóstico
-                    rms        = 0.3,
-                    fmatch     = 0.80,
+                        # Criterios deliberadamente permisivos para diagnóstico
+                        rms        = 0.3,
+                        fmatch     = 0.80,
 
-                    # b: límites, t: picos detectados, f: solución final
-                    debug      = "btf",
+                        # b: límites, t: picos detectados, f: solución final
+                        debug      = "btf",
 
-                    mode       = "ql"
-                )
+                        mode       = "ql"
+                    )
 
-                with open(f"{work_dir}ARCS/database/id{chosen.replace('.fits', '')}", "w", encoding="ascii") as f:
-                    pass
+                    with open(f"{work_dir}ARCS/database/id{chosen.replace('.fits', '')}", "w", encoding="ascii") as f:
+                        pass
 
-                iraf.autoidentify(
-                    images      = f'{chosen}',
 
-                    # Coordenada aproximada en el centro del espectro
-                    crval       = 6580.0,
+                    #6580.0, Valor default para todas las noches del 2023 junio
 
-                    # Solo la magnitud; cddir="unknown" busca ambos sentidos
-                    cdelt       = -0.055,
+                    # Arreglo para que funcione en la noche 1 Marzo 2022
+                    #if 'Arc0001o_crLA' in chosen:
+                    #    id_for_identify = 6565
+                    #else: 
+                    #    id_for_identify = 6584
 
-                    query       = "no",
-                    coordlist   = "linelists$thar.dat",
-                    units       = "angstroms",
+                    # Arreglo para que funcione en la noche 2 Marzo 2022
+                    #if 'Arc0007o_crLA' in chosen:
+                    #    id_for_identify = 6588
+                    #elif ('Arc0016o_crLA' in chosen) or ('Arc0013o_crLA' in chosen) or ('Arc0010o_crLA' in chosen):
+                    #    id_for_identify = 6583
+                    #else: 
+                    #    id_for_identify = 6584    
 
-                    interactive = "YES",
 
-                    section     = "middle line",
-                    nsum        = 10,
+                    # Arreglo para que funcione en la noche 5 Marzo 2022
+                    #if 'Arc0017o_crLA' in chosen:
+                    #    id_for_identify = 6586
+                    #else: 
+                    #    id_for_identify = 6584    
 
-                    ftype       = "emission",
 
-                    # Valores permisivos para detectar primero los picos
-                    fwidth      = 5.0,
-                    cradius     = 3.0,
-                    threshold   = 0.0,
-                    minsep      = 1.0,
-
-                    # En píxeles por ser negativo
-                    match       = -5.0,
-
-                    # Solución lineal inicial
-                    function    = "spline3",
-                    order       = 1,
-
-                    sample      = "*",
-                    niterate    = 1,
-                    low_reject  = 3.0,
-                    high_reject = 3.0,
-                    grow        = 0.0,
-
-                    dbwrite     = "yes",
-                    overwrite   = "yes",
-                    database    = f"database",
-
-                    verbose     = "yes",
-                    logfile     = "autoidentify.log",
-                    plotfile    = ""
-                )
-
-                chosen_root = chosen.replace(".fits", "")
-
-                iraf.reidentify(
-                    reference   = chosen_root,
-
-                    # Vacío: primero traza las líneas dentro del propio arco referencia
-                    images      = "",
-
-                    interactive = "no",
-                    section     = "middle line",
-
-                    newaps      = "yes",
-                    override    = "yes",
-                    refit       = "yes",
-
-                    # Fundamental para seguir la curvatura
-                    trace       = "yes",
-
-                    # Para una curvatura fuerte comienza con pasos pequeños
-                    step        = 5,
-                    nsum        = 5,
-
-                    # Al trazar, usa como referencia la fila anterior
-                    shift       = 0.0,
-                    search      = 0.0,
-
-                    # No detener todo el trazado porque se pierda una línea
-                    nlost       = 3,
-
-                    # Debe superar el desplazamiento entre dos pasos consecutivos
-                    cradius     = 6.0,
-                    threshold   = 0.0,
-
-                    addfeatures = "no",
-                    coordlist   = "linelists$thar.dat",
-                    match       = -3.0,
-                    maxfeatures = 50,
-                    minsep      = 2.0,
-
-                    database    = "database",
-                    logfiles    = f"trace_reference_G{G+1}.log",
-                    plotfile    = f"trace_reference_G{G+1}.plot",
-                    verbose     = "yes",
-                    graphics    = "stdgraph"
-                )
+                    # Arreglo para que funcione en la noche 2 noviembre 2023
+                    #if 'Arc0004o_crLA' in chosen:
+                    #    id_for_identify = 6600
+                    #else: 
+                    #    id_for_identify = 6602  
 
 
 
+                    # Arreglo para que funcione en la noche 3 Marzo 2024
+                    #id_for_identify = 6575
+
+                    id_for_identify = input('Ingresar lambda middle:  ')
+                    id_for_identify = int(id_for_identify) * 1
 
 
 
-                # Vamos a cambiar de usar indetify a autoidentify 
-
-                '''
-                iraf.identify(
-                    images = f'{chosen}', #{work_dir}ARCS/
-                    section = "middle line",
-                    database = "database",
-                    coordlist = "linelists$thar.dat",
-                    nsum = 10,
-                    match = 10,
-                    maxfeatures = 150,
-                    zwidth = 100.0,
-                    ftype = "emission",
-                    fwidth = 5.0,
-                    cradius = 3.0,
-                    threshold = 0.0,
-                    minsep = 1.0,
-                    function = "spline3",
-                    order = 1,
-                    sample = "*",
-                    niterate = 1,
-                    low_reject = 3.0,
-                    high_reject = 3.0,
-                    grow = 0.0,
-                    autowrite = "yes",
-                    graphics = "stdgraph"
-                )                
-                '''
+                    #id_for_identify = 6584
 
 
-                iraf.noao()
-                iraf.twodspec()
-                iraf.longslit()
+                    print(f"Chosen/wavelenght: {chosen} , {id_for_identify} \n")
 
+                    #id_for_identify = input("id_for_identify:    \n")
 
+                    iraf.autoidentify(
+                        images      = f'{chosen}',
 
-                if len(grupo_n) >= 1:
-                    with open(f'{work_dir}ARCS/reidentify_{G+1}', "w") as reidentify_list:
-                        for i in grupo_n:
-                            reidentify_list.write(f'{i} \n')
+                        # Coordenada aproximada en el centro del espectro
+                        crval       = id_for_identify,  
+
+                        # Solo la magnitud; cddir="unknown" busca ambos sentidos
+                        cdelt       = -0.055,
+
+                        query       = "no",
+                        coordlist   = "linelists$thar.dat",
+                        units       = "angstroms",
+
+                        interactive = "YES",
+
+                        section     = "middle line",
+                        nsum        = 10,
+
+                        ftype       = "emission",
+
+                        # Valores permisivos para detectar primero los picos
+                        fwidth      = 5.0,
+                        cradius     = 3.0,
+                        threshold   = 0.0,
+                        minsep      = 1.0,
+
+                        # En píxeles por ser negativo
+                        match       = -5.0,
+
+                        # Solución lineal inicial
+                        function    = "spline3",
+                        order       = 1,
+
+                        sample      = "*",
+                        niterate    = 1,
+                        low_reject  = 3.0,
+                        high_reject = 3.0,
+                        grow        = 0.0,
+
+                        dbwrite     = "yes",
+                        overwrite   = "yes",
+                        database    = f"database",
+
+                        verbose     = "yes",
+                        logfile     = "autoidentify.log",
+                        plotfile    = ""
+                    )
+
+                    chosen_root = chosen.replace(".fits", "")
 
                     iraf.reidentify(
                         reference   = chosen_root,
-                        images      = f'@reidentify_{G+1}',
+
+                        # Vacío: primero traza las líneas dentro del propio arco referencia
+                        images      = "",
 
                         interactive = "no",
                         section     = "middle line",
@@ -266,17 +252,21 @@ def WAVELENGHT_CALIBRATION(work_dir):
                         override    = "yes",
                         refit       = "yes",
 
-                        # El arco referencia ya tiene múltiples filas identificadas
-                        trace       = "no",
+                        # Fundamental para seguir la curvatura
+                        trace       = "yes",
 
+                        # Para una curvatura fuerte comienza con pasos pequeños
                         step        = 5,
                         nsum        = 5,
 
-                        # Busca automáticamente pequeños desplazamientos entre arcos
-                        shift       = "INDEF",
-                        search      = "INDEF",
+                        # Al trazar, usa como referencia la fila anterior
+                        shift       = 0.0,
+                        search      = 0.0,
 
+                        # No detener todo el trazado porque se pierda una línea
                         nlost       = 3,
+
+                        # Debe superar el desplazamiento entre dos pasos consecutivos
                         cradius     = 6.0,
                         threshold   = 0.0,
 
@@ -287,8 +277,8 @@ def WAVELENGHT_CALIBRATION(work_dir):
                         minsep      = 2.0,
 
                         database    = "database",
-                        logfiles    = f"reidentify_G{G+1}.log",
-                        plotfile    = f"reidentify_G{G+1}.plot",
+                        logfiles    = f"trace_reference_G{G+1}.log",
+                        plotfile    = f"trace_reference_G{G+1}.plot",
                         verbose     = "yes",
                         graphics    = "stdgraph"
                     )
@@ -298,38 +288,146 @@ def WAVELENGHT_CALIBRATION(work_dir):
 
 
 
+                    # Vamos a cambiar de usar indentify a autoidentify 
+
                     '''
-                    iraf.reidentify(reference = f'{chosen}', # {work_dir}ARCS/
-                        images = f'@reidentify_{G+1}', #{work_dir}ARCS/
-                        interactive = "no",
+                    iraf.identify(
+                        images = f'{chosen}', #{work_dir}ARCS/
                         section = "middle line",
-                        newaps = "yes",
-                        override = "yes",
-                        refit = "yes",
-                        trace = "no",
-                        step = 10,
-                        nsum = 10,
-                        shift = 0.0,
-                        search = 0.0,
-                        nlost = 0,
-                        cradius = 5.0,
-                        threshold = 0.0,
-                        addfeatures = "no",
+                        database = "database",
                         coordlist = "linelists$thar.dat",
-                        match = -3.0,
+                        nsum = 10,
+                        match = 10,
                         maxfeatures = 150,
+                        zwidth = 100.0,
+                        ftype = "emission",
+                        fwidth = 5.0,
+                        cradius = 3.0,
+                        threshold = 0.0,
                         minsep = 1.0,
-                        database = f"database",
-                        logfiles = f"logfile",
-                        verbose = "yes",
+                        function = "spline3",
+                        order = 1,
+                        sample = "*",
+                        niterate = 1,
+                        low_reject = 3.0,
+                        high_reject = 3.0,
+                        grow = 0.0,
+                        autowrite = "yes",
                         graphics = "stdgraph"
-                    )
+                    )                
                     '''
+
+
+                    iraf.noao()
+                    iraf.twodspec()
+                    iraf.longslit()
+
+
+
+                    if len(grupo_n) >= 1:
+                        with open(f'{work_dir}ARCS/reidentify_{G+1}', "w") as reidentify_list:
+                            for i in grupo_n:
+                                reidentify_list.write(f'{i} \n')
+
+                        iraf.reidentify(
+                            reference   = chosen_root,
+                            images      = f'@reidentify_{G+1}',
+
+                            interactive = "no",
+                            section     = "middle line",
+
+                            newaps      = "yes",
+                            override    = "yes",
+                            refit       = "yes",
+
+                            # El arco referencia ya tiene múltiples filas identificadas
+                            trace       = "no",
+
+                            step        = 5,
+                            nsum        = 5,
+
+                            # Busca automáticamente pequeños desplazamientos entre arcos
+                            shift       = "INDEF",
+                            search      = "INDEF",
+
+                            nlost       = 3,
+                            cradius     = 6.0,
+                            threshold   = 0.0,
+
+                            addfeatures = "no",
+                            coordlist   = "linelists$thar.dat",
+                            match       = -3.0,
+                            maxfeatures = 50,
+                            minsep      = 2.0,
+
+                            database    = "database",
+                            logfiles    = f"reidentify_G{G+1}.log",
+                            plotfile    = f"reidentify_G{G+1}.plot",
+                            verbose     = "yes",
+                            graphics    = "stdgraph"
+                        )
+
+
+                    notify(f'Salio bien la calibracion para WaveLeng_calG{G+1}? \n')
+
+                    wave_calib_status_check = input('Status: ')
+
+                    if wave_calib_status_check == 'n':
+                        print('Borrando archivos residuales para volver a iterar... \n')
+
+                        os.remove(f'{work_dir}ARCS/reidentify_{G+1}')
+                        os.remove(f'{work_dir}ARCS/reidentify_G{G+1}.log')
+                        os.remove(f'{work_dir}ARCS/reidentify_G{G+1}.plot')
+                        os.remove(f'{work_dir}ARCS/trace_reference_G{G+1}.log')
+                        os.remove(f'{work_dir}ARCS/trace_reference_G{G+1}.plot')
+
+                        grupo_n_remove = []
+                        with open(f'{work_dir}ARCS/WaveLeng_calG{G+1}', "r") as arc_individual:
+                            for line in arc_individual:
+                                grupo_n_remove.append(line.strip())
+
+
+                        for R in range(len(grupo_n_remove)):
+                            print(f'Borrando {grupo_n_remove[R].replace('.fits', '')} \n')
+                            os.remove(f'{work_dir}ARCS/database/id{grupo_n_remove[R].replace('.fits', '')}')
+
+                        # Se pregunta, si es no, entonces borrar archivos en database y trace y bla bla y volver a intentar
+
+                        '''
+                        iraf.reidentify(reference = f'{chosen}', # {work_dir}ARCS/
+                            images = f'@reidentify_{G+1}', #{work_dir}ARCS/
+                            interactive = "no",
+                            section = "middle line",
+                            newaps = "yes",
+                            override = "yes",
+                            refit = "yes",
+                            trace = "no",
+                            step = 10,
+                            nsum = 10,
+                            shift = 0.0,
+                            search = 0.0,
+                            nlost = 0,
+                            cradius = 5.0,
+                            threshold = 0.0,
+                            addfeatures = "no",
+                            coordlist = "linelists$thar.dat",
+                            match = -3.0,
+                            maxfeatures = 150,
+                            minsep = 1.0,
+                            database = f"database",
+                            logfiles = f"logfile",
+                            verbose = "yes",
+                            graphics = "stdgraph"
+                        )
+                        '''
 
 
             os.chdir(original_dir)
             RS['16'][0] = True
             guardar_logfile(f'{work_dir}/log_reduc',RS)
+
+
+
         except:
             RS['16'][0] = False
             guardar_logfile(f'{work_dir}/log_reduc',RS)

@@ -171,14 +171,20 @@ def MASTERFLAT(work_dir):
                 header = hdul[0].header
 
             fuga_mask = np.zeros(data.shape, dtype=bool)
-            fuga_mask[:,275:335] = True  
+            fuga_mask[:,220:310] = True  
 
-            # 2023 junio [275:335] N1
+            # 2023 junio [275:335] N1-N6
 
-            # Para la noche 5 del 2022 mar hubo que correrlo un poco a la derecha :,265:322. El original que estaba usando era: :,275:332
-            # Noche N1 de 2023 nov tambien cambia a 240:315
-            # Noche N2 de 2023 nov tambien cambia a 240:327
-            # Noche N3 de 2024 mar tambien cambia a 220:310
+            # 2022 marzo [,275:332] N1-N4
+            # 2022 marzo [,265:322] N5
+
+            # 2023 noviembre [,230:320] N1
+            # 2023 noviembre [,235:327] N2
+
+            # 2024 marzo [,220:310] N3
+
+
+
             data_smooth = median_filter(data, size=(1, 200)) 
             data[fuga_mask] = data_smooth[fuga_mask]
 

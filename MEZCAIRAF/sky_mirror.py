@@ -241,6 +241,22 @@ def sky_location_helper(file):
                         color="lime", marker="+", markersize=20, markeredgewidth=2
                     )
                     #ax2.set_title(f"Referencia: {encuesta_usada}", fontsize=14)
+
+                    print(f'======> COORDENADAS REALES  RA:{ra_real} , DEC: {dec_real}\n')
+                    print(f'{ra_real} {dec_real}\n')
+                    ax2.text(
+                        0.98,
+                        0.05,
+                        f'RA:{ra_real} , DEC: {dec_real}',
+                        transform=ax2.transAxes,
+                        ha='right',
+                        va='bottom',
+                        fontsize=10,
+                        color='gray',
+                    )
+
+
+
                     ax2.axis("off")
                 else:
                     ax2.text(0.5, 0.5, "No se encontró imagen\nen ningún catálogo", 

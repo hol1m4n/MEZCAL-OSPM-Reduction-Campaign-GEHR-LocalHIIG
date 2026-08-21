@@ -704,7 +704,7 @@ def sigma_calculator_function(Host = '',
 def sigma_runner(work_dir):
 
 
-    sigma_start = input('Ya se existe/se movio el archivo de centroides a la carpeta Sigma_fit?(y/n):   ')
+    sigma_start = input('Ya existe/se movio el archivo de centroides a la carpeta Sigma_fit?(y/n):   ')
     if sigma_start == 'y':
         print('Continuamos...\n')  
 

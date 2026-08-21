@@ -59,7 +59,7 @@ class Plotganizer:
                     if 'M' in name:
                         return ['object',(name.replace('M','MESSIER')).replace('.fits',''),'OBJS']
                     if 'J' in name:
-                        return ['object',name.replace('.fits',''),'OBJS']
+                        return ['object',(name.replace('J','SDSSHIIG')).replace('.fits',''),'OBJS']
                 
 
         # Agregar informacion adicional a los headers
